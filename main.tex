@@ -1,0 +1,264 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  My documentation report
+%  Objective: Explain what I did and how, in order to help someone continue with the investigation
+%
+% Important note:
+% Chapter heading images should have a 2:1 width:height ratio,
+% e.g. 920px width and 460px height.
+%
+% The images can be found anywhere, usually on sky surveys websites or the
+% Astronomy Picture of the day archive http://apod.nasa.gov/apod/archivepix.html
+%
+% The original template (the Legrand Orange Book Template) can be found here --> http://www.latextemplates.com/template/the-legrand-orange-book
+%
+% Original author of the Legrand Orange Book Template:
+% Mathias Legrand (legrand.mathias@gmail.com) with modifications by:
+% Vel (vel@latextemplates.com)
+%
+% Original License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt,oneside,onemany]{book} % Default font size and left-justified equations
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\usepackage[top=3cm,bottom=3cm,left=3.2cm,right=3.2cm,headsep=10pt,letterpaper]{geometry} % Page margins
+\usepackage{xcolor} % Required for specifying colors by name
+\definecolor{ocre}{RGB}{52,177,201} % Define the orange color used for highlighting throughout the book
+
+% Font Settings
+\usepackage{avant} % Use the Avantgarde font for headings
+%\usepackage{times} % Use the Times font for headings
+\usepackage{mathptmx} % Use the Adobe Times Roman as the default text font together with math symbols from the Sym­bol, Chancery and Com­puter Modern fonts
+
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage[utf8]{inputenc} % Required for including letters with accents
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+
+% Bibliography
+\usepackage[style=alphabetic,sorting=nyt,sortcites=true,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber]{biblatex}
+\addbibresource{bibliography.bib} % BibTeX bibliography file
+\defbibheading{bibempty}{}
+
+\input{structure} % Insert the commands.tex file which contains the majority of the structure behind the template
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+\begin{document}
+\title{Machine Learning}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begingroup
+\thispagestyle{empty}
+\AddToShipoutPicture*{\put(0,0){\includegraphics[scale=0.68]{bg}}} % Image background
+\centering
+\vspace*{5cm}
+\par\normalfont\fontsize{35}{35}\sffamily\selectfont
+\textbf{Machine Learning}\\
+{\LARGE Understanding Machine Learning and its Applications}\par % Book title
+\vspace*{1cm}
+{\Huge Akash Cherukuri}\par % Author name
+\endgroup
+
+%----------------------------------------------------------------------------------------
+%	COPYRIGHT PAGE
+%----------------------------------------------------------------------------------------
+
+\newpage
+~\vfill
+
+%\noindent Copyright \copyright\ 2014 Andrea Hidalgo\\ % Copyright notice
+
+\noindent \textsc{Winter Vacation Self Project, IIT Bombay}\\
+
+%\noindent \textsc{github.com/LaurethTeX/Clustering}\\ % URL
+
+\noindent The reference for these notes have been taken from ``Understanding Machine Learning: From Theory to Algorithms \copyright 2014 by Shai Shalev-Shwartz and Shai Ben-David"\\ % License information
+
+%\noindent \textit{First release, August 2014} % Printing/edition date
+
+%----------------------------------------------------------------------------------------
+%	TABLE OF CONTENTS
+%----------------------------------------------------------------------------------------
+
+\chapterimage{header1.png} % Table of contents heading image
+
+%\pagestyle{empty} % No headers
+
+\tableofcontents % Print the table of contents itself
+
+%\cleardoublepage % Forces the first chapter to start on an odd page so it's on the right
+
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 1
+%----------------------------------------------------------------------------------------
+
+\chapterimage{header2.png} % Chapter heading image
+
+\chapter{Formal Learning Models}
+
+%------------
+%\mathcal symbol needs to be changed
+\section{PAC Learning}
+We have seen previously that for a finite hypothesis class $\mathcal{H}$, assuming that the \emph{Realizability Assumption} holds, for a sufficiently large sample $S$, the ERM algorithm yields an estimator which is \emph{Probably Approximately Correct}. We will now define PAC learning formally.
+
+\begin{definition}
+(PAC Learnability) A hypothesis class $\mathcal{H}$ is said to be \emph{PAC Learnable} iff there exists a function $m_\mathcal{H}(0,1)^2\rightarrow\mathbb{R}$ and a learning algorithm for every distribution $\mathcal{D}$ over $\chi$ and every binary ``True Label" $f$, for a sample size larger than $m_\mathcal{H}(\epsilon,\delta)$ under the \emph{Realizability Assumption}, yields an estimator which is \emph{Accurately Correct} to a margin of $\epsilon$ with a \emph{Probability} of $(1-\delta)$.
+\end{definition}
+
+Notice that the minimum number of samples needed depends on the parameters $(\epsilon, \delta)$. The function $m_\mathcal{H}$ is said to be the \emph{Sample Complexity} of learning $\mathcal{H}$, as it gives an estimate of the size of the training sample needed. It is clear that there might exist infinitely many such functions, therefore we define the sample complexity to be the minimal of all such possible functions.\\
+
+We have already derived a bound for the sample complexity on case that $\mathcal{H}$ was finite:
+
+$$m_\mathcal{H} \leq \ceil*{\frac{\log(|\mathcal{H}|)/\delta}{\epsilon}}$$
+
+\section{Agnostic PAC Learning}
+We now try to relax the assumptions so far. The two main assumptions that we've been using are:
+\begin{enumerate}
+    \item Realizability Assumption
+    \item The labelling function is binary in nature
+\end{enumerate}
+\vspace{3mm}
+We will be focusing on the Realizability assumption for now. It may be too strong in some cases, as the Data set need not have a subset which depicts the entire data set properly. Also, two data sets being equal need not necessarily imply that their labels are equal as well. For example, we have two papayas with the same color and hardness, but one of the papayas is sweet and the other is bitter. We will be taking this into consideration as well.
+
+\subsection{Redefining Data Generating Distribution}
+Previously, we've taken that the distribution $\mathcal{D}$ is over $\mathcal{X}$, but this fails to account for the papayas example previously shown. We thus redefine the distribution to be over $(\mathcal{X},\mathcal{Y})$, from which the marginal distribution $\mathcal{D}_\mathcal{X}$ can be calculated and the data points generated. This distribution is also renamed as \emph{Data Labels Generating Distribution} to take into account that even $\mathcal{Y}$ is distributed according to $\mathcal{D}$ now.\\
+
+\subsection{Redefining Risk Calculations}
+By redefining the data generating distribution, we have also rendered the true error calculation obsolete. However, using the new definition of $\mathcal{D}$ we can redefine the true risk to be the \emph{Probability of picking a pair $(x,y)$ such that $h(x)\neq y$}.
+More formally,
+
+$$\mathcal{L}_{(x,y)\sim D} = P[\{(x,y): h(x)\neq y\}]$$
+
+However, the distribution is unavailable to the agent during its training. Thus the definition of empirical risk is unaffected by these changes, and it remains as follows. Notice that the empirical loss is the same as assuming that the distribution $\mathcal{D}$ is \emph{Uniform} in the sample set $S$.
+
+$$\mathcal{L}_S(h_S) = \frac{|\{x: x\in S,h(x)\neq y\}|}{m}$$
+
+\subsection{Bayes' Optimal Predictor}
+For any probability distribution $\mathcal{D}$ over a binary label $\{0,1\}$, the estimator which gives the least error is the following:
+$$
+    h^*(x) = 
+  \begin{cases}
+    1; & \text{ if } P(y=1|x)\geq 0.5 \\
+    0; & \text{otherwise}
+  \end{cases}  
+$$
+
+However, because the distribution is unknown, we cannot use this predictor. However we can use the idea that there is a minimum probable risk that any estimator can attain to define when a hypothesis class is said to be \emph{learnable}.
+
+\begin{definition}
+\label{def:agn-PAC}
+(Agnostic PAC Learnability) A hypothesis class $\mathcal{H}$ is said to be \emph{Agnostic PAC Learnable} iff there exists a function $m_\mathcal{H}(0,1)^2\rightarrow\mathbb{R}$ and a learning algorithm for every distribution $\mathcal{D}$ over $\mathcal{X}\{0,1\}$, for a sample size larger than $m_\mathcal{H}(\epsilon,\delta)$, which yields an estimator which is \emph{Accurately Correct} to a margin of $\epsilon + \min\limits_{h\in \mathcal{H}}(\mathcal{L}_\mathcal{D}(h))$ with a \emph{Probability} of $(1-\delta)$.
+\end{definition}
+
+Notice that the error now corresponds to the relative best that the hypothesis class can produce, which would become the absolute error is we took that the Realizability Assumption is valid. This is therefore, a more general way of defining the term.
+
+\section{Extending the Scope of PAC Learning}
+
+So far, we've taken that the label set is \emph{binary} in nature. This was the second assumption which we wished to generalize in section 1.2. Extending the label set to be finite, we can understand that the redefined terms of data generating distribution and the rick functions still hold good. For example, let the label set $\mathcal{Y}$ be the classification of emails, and our agent is supposed to learn how to do this properly. We can see that, in this case, the risk function would become \emph{``Probability that the assigned label by the estimator is incorrect"}, which can be found using the data-labels generating distribution.\\
+
+However, if the label set was not finite we would have to make some changes. For example, let's say we wish to find the approximate dimensions of an object by looking at its picture alone. The label set, in this case is referred to as the \emph{Target Set}, would be the set of all positive real numbers. Notice how we cannot use the earlier definition of loss functions; hence we iterate them.\\
+
+\begin{definition}
+(Generalized Loss Functions) Let $\mathcal{H}$ be the Estimator Class, and $\mathcal{Z}$ be some domain. Any function $l:\mathcal{H}\times\mathcal{Z}\rightarrow\mathbb{R}_+$ is said to be a loss function.
+\end{definition}
+
+In the case of estimators, the set $\mathcal{Z} = \mathcal{X}\times\mathcal{Y}$ but this need not always be the case. We can see that the distribution $\mathcal{D}$ would now be over the set $\mathcal{Z}$. Therefore, using this new definition of a loss function, we can see that the True Risk would be the expected value of the loss function. Formally,
+
+$$
+\mathcal{L}_\mathcal{D}(h) = \underset{z\sim \mathcal{D}}{E}[l(h,z)]
+$$
+%Need to fix this!
+The definition of empirical risk shall be similar:
+$$
+\mathcal{L}_S(h) = \frac{1}{m}\sum_{z\in \mathcal{Z}}l(h,z)
+$$
+
+The definition of \emph{Agnostic Learnability} doesn't change much, as there is only a significant change in the way that the loss functions are defined, and it would imply that a change would occur in the way that we calculate the minimum possible loss for a given class of estimators.
+\newpage
+\section{Learning via Uniform Convergence}
+Till now, we've discussed with and without using the Realizability Assumption that we could obtain an estimator for a finite hypothesis class which models the sample properly. However, this doesn't imply that the other estimators, with a similar empirical risk, would model the data set properly. For instance, assume we obtained another estimator whose $\mathcal{L}_S(h)$ was nearly the same, but was much easier to compute. We have no way of saying whether this estimator would model the data set properly. This is the inspiration behind \emph{Uniform Convergence}. We essentially try to ensure that the risks of all the estimators are uniformly convergent to their true values.\\
+
+\begin{definition}
+($\epsilon$-Representative Sample) A sample set $S$ is said to be $\epsilon$-representative (w.r.t given $\mathcal{Z}, \mathcal{D}, f, \mathcal{H}$) if for all $h \in \mathcal{H}$ the modulus of the difference between true risk and the empirical risk is lesser than $\epsilon$.
+$$
+  \left| \mathcal{L}_{\mathcal{D}}(h) - \mathcal{L}_S(h) \right| \leq \epsilon
+$$
+\end{definition}
+
+There is a very interesting relation between the two $\epsilon$ that have been used here, and in the definition of PAC Learnability. This has been stated in the theorem below, following its proof.\\
+
+\begin{theorem}
+Assume that the sample $S$ is $\frac{\epsilon}{2}$-representative (w.r.t given $\mathcal{Z}, \mathcal{D}, f, \mathcal{H}$), then any estimator $h_S = \text{ERM}_\mathcal{H}$ would satisfy the following inequality.
+$$
+    \mathcal{L}_\mathcal{D}(h_S) \leq \min\limits_{h\in\mathcal{H}}\mathcal{L}_\mathcal{D}(h) + \epsilon
+$$
+\end{theorem}
+
+That is, if we could show that the probability of obtaining such a sample $S$ was at least $(1-\delta)$, then the ERM-Hypothesis would be Agnostic Learnable (from \hyperref[def:agn-PAC]{definition 1.2.1}). This forms the basis of defining what \emph{Uniform Convergence} means.
+
+\begin{definition}
+\label{def:uc}
+(Uniform Convergence) A hypothesis class $\mathcal{H}$ is said to be \emph{Uniformly Convergent} wrt the label function $f$ and the domain $\mathcal{Z}$ iff for every distribution $\mathcal{D}$ over $\mathcal{Z}$ and every $(\epsilon,\delta)\in(0,1)^2$, there exists a function $m^{UC}:(0,1)^2\rightarrow\mathbb{N}$ such that a sample $S$ with size greater than $m^{UC}(\epsilon,\delta)$ would be $\epsilon$-representative with a probability of $(1-\delta)$.
+\end{definition}
+
+Similar to how we had defined the sample complexity to be the value of $m_\mathcal{H}(\epsilon,\delta)$, we define the sample complexity for the hypothesis class to be uniformly convergent as $m_\mathcal{H}^{UC}(\epsilon,\delta)$. It is clearly evident that $m_\mathcal{H}(\epsilon,\delta) \leq m_\mathcal{H}^{UC}(\epsilon/2,\delta)$. The proof can be arrived at via contradiction fairly quickly, because if the inequality were the other way around, it would imply that there would be cases such that the set is representative but not Agnostic PAC Learnable.
+
+We have previously shown that PAC Learning occurs for all finite hypothesis classes, as long as they satisfy the realizability assumption. We now use the concept of uniform convergence to show that the realizability assumption is not necessary, and that there would analogously exist a minimum sample size.
+
+\section{Finite Hypothesis Classes are Agnostic PAC Learnable}
+\label{agn-PAC-finite}
+
+Similar to what we had done previously, we with to arrive upon a result for a function which would state the minimum possible size of the sample needed. Let us define the problem statement first.\\
+
+Given the values of $\epsilon, \delta$ we need to find an expression for the $m$, such that;
+$$|S|>m \implies \text{P}\left[\forall h\in\mathcal{H}: |\mathcal{L}_\mathcal{D}(h) - \mathcal{L}_S(h) | \leq \epsilon\right] \geq 1-\delta$$
+Equivalently, we can write that
+\begin{align*}
+    & \text{P}\left[\forall h\in\mathcal{H}:| \mathcal{L}_\mathcal{D}(h) - \mathcal{L}_S(h) | > \epsilon\right] < \delta \\
+    \implies & \text{P}\left[\bigcup\limits_{h\in\mathcal{H}}\{S:| \mathcal{L}_\mathcal{D}(h) - \mathcal{L}_S(h) | > \epsilon\}\right] < \delta \\
+\end{align*}
+We now try to maximize the LHS of the inequality to get minimum value of m.
+$$
+    \text{P}\left[\bigcup\limits_{h\in\mathcal{H}}\{S:| \mathcal{L}_\mathcal{D}(h) - \mathcal{L}_S(h) | > \epsilon\}\right] \leq 
+    \sum_{h\in\mathcal{H}}\text{P}\left[ |\mathcal{L}_\mathcal{D}(h)-\mathcal{L}_S(h)| > \epsilon \right]
+$$
+
+If we look at the definitions of the loss functions, the True loss function is the expected value of the generalized loss function where as the Empirical loss function is the empirical mean of the values of the loss function over all the data points in the sample. Although we can say from \emph{The Law of Large Numbers} that they both would be nearly equal asymptotically, this isn't true for finite values. We therefore use an inequality called the \emph{Hoeffding’s Inequality} which tells us how close they both can get.
+
+\begin{theorem}
+(Hoeffding's Inequality) Given $m$ i.i.d random variables $x_1,x_2\cdots x_m$ where $\text{E}[x_i]=\mu$ and $\text{P}[a\leq x_i\leq b]=1$, then for any $\epsilon>0$ we have that:
+$$
+    \text{P}\left[ \left| \frac{1}{m}\sum_{i=1}^mx_i - \mu \right| > \epsilon \right] < 2\exp\left[ \frac{-2m\epsilon^2}{(b-a)^2} \right]
+$$
+\end{theorem}
+
+Assuming that the loss function has a range of $(0,1)$, we can use this theorem in the inequality which we obtained earlier;
+\begin{align*}
+    \text{P}\left[\bigcup\limits_{h\in\mathcal{H}}\{S:| \mathcal{L}_\mathcal{D}(h) - \mathcal{L}_S(h) | > \epsilon\}\right] &\leq 
+    \sum_{h\in\mathcal{H}}\text{P}\left[ |\mathcal{L}_\mathcal{D}(h)-\mathcal{L}_S(h)| > \epsilon \right] \\
+    &< 2|\mathcal{H}|\exp\left[ \frac{-2m\epsilon^2}{(b-a)^2} \right]
+    \\
+    &< 2|\mathcal{H}|\exp\left[ -2m\epsilon^2 \right]
+\end{align*}
+
+From this we obtain that;
+$$
+    m \geq \frac{\log(2|\mathcal{H}|/\delta)}{2\epsilon^2} \implies
+    \text{P}\left[\forall h\in\mathcal{H}: |\mathcal{L}_\mathcal{D}(h) - \mathcal{L}_S(h) | \leq \epsilon\right] \geq 1-\delta
+$$
+
+We have successfully shown that \emph{Every finite hypothesis class is Uniformly Convergent, and thus by extension, Agnostic PAC Learnable}. This can be improperly extended to infinite hypothesis classes as well, because all numbers in practice are represented by, say, 64 bits. This would imply that the set $\mathbb{N}$ would be finite and have a size of $2^{64}$. A more formal proof will be learnt further down the line.
+
+\chapterimage{header3.png}
+\chapter{VC Dimension}
+
+\input{Chapters/Ch2-Bias-Compl}
+
+\end{document}
